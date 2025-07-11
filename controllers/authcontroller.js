@@ -55,3 +55,34 @@ process.env.JWT_SECRET,
 );
 res.json({ token,user });
 }
+
+
+exports.adminLogin = async (req, res) => {
+  const { role, password } = req.body;
+
+  if (role !== 'admin') {
+    return res.status(403).json({ error: "Access denied: Not an admin." });
+  }
+
+  const user = await User.findOne({ role: 'admin' });
+
+  if (!user) return res.status(400).json({ error: "Admin not found" });
+
+  if (password !== "admin@123") {
+    return res.status(401).json({ error: "Invalid Password" });
+  }
+
+  const token = jwt.sign(
+    {
+      uid: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "2h",
+    }
+  );
+
+  res.json({ token, user });
+};
