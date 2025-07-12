@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../midlewares/upload');
+const multer = require('multer');
+const upload = multer({ storage });
+const { storage } = require('../utils/cloudinary'); 
 const { signup, Login,adminLogin } = require('../controllers/authcontroller');
 
 router.post('/signup',upload.single('profileImage'), signup);
