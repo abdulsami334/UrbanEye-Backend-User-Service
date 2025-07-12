@@ -5,23 +5,23 @@ const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./routes/userRoute');
 
-dotenv.config();
+dotenv.config(); // ✅ Make sure this is at the top to load env variables
+
 const app = express();
 
-// Environment Variable Safety Check
-if (!process.env.MONGO_URI || !process.env.PORT) {
-  console.error("❌ MONGO_URI or PORT not set in .env");
+// ✅ Check env variables are present
+if (!process.env.MONGO_URI || !process.env.PORT || !process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY || !process.env.CLOUD_API_SECRET) {
+  console.error("❌ One or more required environment variables are missing");
   process.exit(1);
 }
 
-// Allowed origins for development
+// ✅ CORS Setup
 const allowedOrigins = [
   'http://localhost:3000',
   'http://10.0.2.2:3000',
   'http://192.168.10.18:5000'
 ];
 
-// CORS Setup
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -35,13 +35,13 @@ app.use(cors({
 
 app.use(express.json());
 
-// Serve static uploads (e.g., profile images)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// ❌ You can remove this if you're not serving static uploads anymore:
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
+// ✅ Routes
 app.use('/api/users', authRoutes);
 
-// MongoDB Connection and Server Start
+// ✅ MongoDB + Server
 mongoose.connect(process.env.MONGO_URI, {
   connectTimeoutMS: 5000,
   socketTimeoutMS: 5000,
@@ -58,13 +58,12 @@ mongoose.connect(process.env.MONGO_URI, {
   process.exit(1);
 });
 
-
+// ✅ Health route
 app.get('/api/users/test', (req, res) => {
   res.send('✅ Mobile se backend chal gaya!');
 });
 
-
-// Graceful Shutdown (Optional)
+// ✅ Optional graceful shutdown
 process.on('SIGINT', async () => {
   await mongoose.disconnect();
   console.log("🛑 MongoDB disconnected on app termination");
