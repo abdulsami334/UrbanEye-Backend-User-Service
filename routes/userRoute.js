@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
+const { storage } = require('../utils/cloudinary');
 const upload = multer({ storage });
-const { storage } = require('../utils/cloudinary'); 
+ 
 const { signup, Login,adminLogin } = require('../controllers/authcontroller');
 
 router.post('/signup',upload.single('profileImage'), signup);
